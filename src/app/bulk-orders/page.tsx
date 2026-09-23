@@ -1,19 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Building2, CheckCircle2, Send, Loader2, ShieldCheck, Sparkles, Package } from "lucide-react";
-import { PRODUCTS_DATA } from "@/data/products";
 import CustomSelect from "@/components/CustomSelect";
+import CategorySelect from "@/components/CategorySelect";
 
 export default function BulkOrdersPage() {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingCatalog, setLoadingCatalog] = useState(true);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     businessName: "",
     businessType: "restaurant",
-    productInterest: PRODUCTS_DATA[0]?.name || "",
+    selectedCategory: "",
+    productInterest: "",
     quantity: "",
     message: "",
   });
@@ -28,8 +33,65 @@ export default function BulkOrdersPage() {
     error: null,
   });
 
+  // Fetch categories and products on mount
+  useEffect(() => {
+    async function fetchCatalog() {
+      try {
+        setLoadingCatalog(true);
+        const [catRes, prodRes] = await Promise.all([
+          fetch("/api/categories"),
+          fetch("/api/products")
+        ]);
+
+        const catJson = await catRes.json();
+        const prodJson = await prodRes.json();
+
+        if (catJson.success && catJson.data.length > 0) {
+          setCategories(catJson.data);
+          const defaultCatId = catJson.data[0]._id;
+
+          if (prodJson.success && prodJson.data.length > 0) {
+            setProducts(prodJson.data);
+
+            // Filter products belonging to the initial default category
+            const initialProds = prodJson.data.filter((p: any) => {
+              const catId = typeof p.category === "object" ? p.category?._id : p.category;
+              return catId === defaultCatId;
+            });
+
+            setFormData((prev) => ({
+              ...prev,
+              selectedCategory: defaultCatId,
+              productInterest: initialProds[0]?.name || prodJson.data[0]?.name || "",
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load catalog data", err);
+      } finally {
+        setLoadingCatalog(false);
+      }
+    }
+
+    fetchCatalog();
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handler when user changes the category dropdown
+  const handleCategoryChange = (catId: string) => {
+    const matchingProducts = products.filter((p) => {
+      const cId = typeof p.category === "object" ? p.category?._id : p.category;
+      return cId === catId;
+    });
+
+    setFormData({
+      ...formData,
+      selectedCategory: catId,
+      productInterest: matchingProducts[0]?.name || "",
+    });
   };
 
   // Dedicated handler for the custom product interest dropdown
@@ -55,13 +117,21 @@ export default function BulkOrdersPage() {
       }
 
       setStatus({ submitting: false, success: true, error: null });
+      // Reset form fields while preserving initial category/product defaults
+      const defaultCatId = categories[0]?._id || "";
+      const defaultProds = products.filter((p) => {
+        const cId = typeof p.category === "object" ? p.category?._id : p.category;
+        return cId === defaultCatId;
+      });
+
       setFormData({
         name: "",
         email: "",
         phone: "",
         businessName: "",
         businessType: "restaurant",
-        productInterest: PRODUCTS_DATA[0]?.name || "",
+        selectedCategory: defaultCatId,
+        productInterest: defaultProds[0]?.name || "",
         quantity: "",
         message: "",
       });
@@ -70,13 +140,16 @@ export default function BulkOrdersPage() {
     }
   };
 
-  const biodegradableProducts = PRODUCTS_DATA.filter((p) => p.category === "biodegradable");
-  const spiceProducts = PRODUCTS_DATA.filter((p) => p.category === "spices");
+  // Filter products for the CustomSelect based on active category
+  const filteredProductsForSelect = products.filter((p) => {
+    const cId = typeof p.category === "object" ? p.category?._id : p.category;
+    return cId === formData.selectedCategory;
+  });
 
   return (
     <div className="w-full bg-[#FAF9F5] min-h-screen py-16 px-6 md:px-12 lg:px-20">
       <div className="mx-auto max-w-6xl">
-        
+
         {/* Page Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1C3516]/10 text-[#1C3516] text-xs font-semibold tracking-widest uppercase mb-4">
@@ -138,6 +211,10 @@ export default function BulkOrdersPage() {
               >
                 Submit Another Request
               </button>
+            </div>
+          ) : loadingCatalog ? (
+            <div className="py-16 text-center text-stone-500 text-xs animate-pulse">
+              Loading catalog options from database...
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -209,7 +286,7 @@ export default function BulkOrdersPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-2">
                     Business Type
@@ -227,14 +304,26 @@ export default function BulkOrdersPage() {
                     <option value="other">Other Institution</option>
                   </select>
                 </div>
+
+                {/* Database Category Dropdown */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-2">
-                    Primary Product Interest
+                    Product Category
                   </label>
-                  {/* Custom Smooth Animated Dropdown Component */}
+                  <CategorySelect
+                    categories={categories}
+                    value={formData.selectedCategory}
+                    onChange={handleCategoryChange}
+                  />
+                </div>
+
+                {/* Custom Animated Product Dropdown */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-2">
+                    Product Interest
+                  </label>
                   <CustomSelect
-                    biodegradableProducts={biodegradableProducts}
-                    spiceProducts={spiceProducts}
+                    products={filteredProductsForSelect}
                     value={formData.productInterest}
                     onChange={handleProductChange}
                   />

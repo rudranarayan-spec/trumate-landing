@@ -1,21 +1,20 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check, Sparkles } from "lucide-react";
+import { ChevronDown, Check, FolderTree } from "lucide-react";
 
-interface CustomSelectProps {
-  products: any[];
+interface CategorySelectProps {
+  categories: any[];
   value: string;
   onChange: (value: string) => void;
 }
 
-export function CustomSelect({ products, value, onChange }: CustomSelectProps) {
+export default function CategorySelect({ categories, value, onChange }: CategorySelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedProduct = products.find((p) => p.name === value) || products[0];
+  const selectedCategory = categories.find((cat) => cat._id === value) || categories[0];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -36,13 +35,9 @@ export function CustomSelect({ products, value, onChange }: CustomSelectProps) {
           isOpen ? "border-[#1C3516] bg-white ring-2 ring-[#1C3516]/10 shadow-sm" : "border-stone-300 hover:border-stone-400"
         }`}
       >
-        <span className="truncate font-medium flex items-center gap-2">
-          {selectedProduct ? selectedProduct.name : "No products available"}
-          {selectedProduct?.status?.toLowerCase() === "coming-soon" && (
-            <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-semibold">
-              Coming Soon
-            </span>
-          )}
+        <span className="truncate font-medium flex items-center gap-2.5">
+          <FolderTree className="size-4 text-stone-400" />
+          {selectedCategory ? selectedCategory.name : "Select category"}
         </span>
         <ChevronDown
           className={`size-4 text-stone-500 transition-transform duration-300 ${
@@ -59,19 +54,18 @@ export function CustomSelect({ products, value, onChange }: CustomSelectProps) {
         }`}
       >
         <div className="max-h-60 overflow-y-auto p-2 space-y-1 custom-scrollbar">
-          {products.length === 0 ? (
-            <div className="p-3 text-xs text-stone-400 text-center">No products in this category</div>
+          {categories.length === 0 ? (
+            <div className="p-3 text-xs text-stone-400 text-center">No categories found</div>
           ) : (
-            products.map((product) => {
-              const isSelected = value === product.name;
-              const isComingSoon = product.status?.toLowerCase() === "coming-soon";
+            categories.map((cat) => {
+              const isSelected = value === cat._id;
 
               return (
                 <button
-                  key={product._id}
+                  key={cat._id}
                   type="button"
                   onClick={() => {
-                    onChange(product.name);
+                    onChange(cat._id);
                     setIsOpen(false);
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl text-left transition-colors cursor-pointer ${
@@ -80,14 +74,7 @@ export function CustomSelect({ products, value, onChange }: CustomSelectProps) {
                       : "text-stone-700 hover:bg-stone-100"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    {product.name}
-                    {isComingSoon && (
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-md ${isSelected ? "bg-amber-900/40 text-amber-200" : "bg-amber-50 text-amber-800"}`}>
-                        <Sparkles className="size-2.5 inline mr-0.5" /> Coming Soon
-                      </span>
-                    )}
-                  </span>
+                  <span>{cat.name}</span>
                   {isSelected && <Check className="size-3.5 text-amber-300" />}
                 </button>
               );
@@ -98,5 +85,3 @@ export function CustomSelect({ products, value, onChange }: CustomSelectProps) {
     </div>
   );
 }
-
-export default CustomSelect;
