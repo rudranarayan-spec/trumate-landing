@@ -3,14 +3,18 @@ import DealsSection from "@/components/DealsSection";
 import DownloadAppSection from "@/components/DownloadAppSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import WhyChooseUs from "@/components/WhyChooseUs";
 
 export default function Home() {
   return (
     <div>
-      {/* Render the Hero Carousel on your landing page */}
+      <Header/>
+        <WhatsAppButton />
+
       <HeroCarousel />
       <DealsSection/>
       <BulkOrdersSection/>
@@ -18,6 +22,7 @@ export default function Home() {
       <TestimonialsSection/>
       <DownloadAppSection/>
       <FAQSection/>
+      <Footer/>
     </div>
   );
 }
