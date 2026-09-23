@@ -21,7 +21,8 @@ async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      family: 4, // Force IPv4 to prevent local network resolution blocks
+      family: 4, 
+      dbName: "trumate_db",
     };
 
     console.log("🔄 Connecting to MongoDB (Standard URI)...");
