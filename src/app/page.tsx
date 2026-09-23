@@ -12,17 +12,16 @@ import WhyChooseUs from "@/components/WhyChooseUs";
 export default function Home() {
   return (
     <div>
-      <Header/>
-        <WhatsAppButton />
-
+      <Header />
+      <WhatsAppButton />
       <HeroCarousel />
-      <DealsSection/>
-      <BulkOrdersSection/>
-      <WhyChooseUs/>
-      <TestimonialsSection/>
-      <DownloadAppSection/>
-      <FAQSection/>
-      <Footer/>
+      <DealsSection />
+      <BulkOrdersSection />
+      <WhyChooseUs />
+      <TestimonialsSection />
+      <DownloadAppSection />
+      <FAQSection />
+      <Footer />
     </div>
   );
 }

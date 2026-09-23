@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Layers, ShoppingCart, ExternalLink, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, Layers, ShoppingCart, ExternalLink, LogOut, MessageSquare } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", href: "/superadmin/dashboard", icon: LayoutDashboard },
   { name: "Products", href: "/superadmin/dashboard/products", icon: Package },
   { name: "Categories", href: "/superadmin/dashboard/categories", icon: Layers },
   { name: "Bulk Orders", href: "/superadmin/dashboard/bulk-orders", icon: ShoppingCart },
+  { name: "Inqueries", href: "/superadmin/dashboard/contact-inqueries", icon: MessageSquare },
 ];
 
 export default function Sidebar() {

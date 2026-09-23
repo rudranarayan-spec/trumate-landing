@@ -11,7 +11,7 @@ export default function BulkOrdersManagementPage() {
   useEffect(() => {
     async function fetchBulkOrders() {
       try {
-        const res = await fetch("/api/bulk-orders"); 
+        const res = await fetch("/api/bulk-order"); 
         const json = await res.json();
         setOrders(json.data || json || []);
       } catch (err) {

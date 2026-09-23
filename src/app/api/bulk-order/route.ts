@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import connectDB from "@/lib/db";
+import BulkOrder from "@/models/BulkOrder";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
@@ -14,7 +18,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // Configure Nodemailer transporter with your SMTP credentials
+    // 1. Connect to Database and Save Order
+    await connectDB();
+    const newBulkOrder = await BulkOrder.create({
+      name,
+      email,
+      phone,
+      businessName,
+      businessType: businessType || "general",
+      productInterest: productInterest || "general",
+      quantity,
+      message,
+      status: "Pending Review",
+    });
+
+    // 2. Configure Nodemailer transporter with your SMTP credentials
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST, // e.g., smtp.gmail.com
       port: Number(process.env.SMTP_PORT) || 587,
@@ -77,18 +95,29 @@ export async function POST(request: Request) {
       `,
     };
 
-    // Send the email
-    await transporter.sendMail(mailOptions);
+    // 3. Send the email
+    await transporter.sendMail ? await transporter.sendMail(mailOptions) : await transporter.sendMail(mailOptions);
 
     return NextResponse.json(
-      { message: "Bulk order submitted successfully and email sent to admin." },
+      { success: true, message: "Bulk order stored in database and email sent successfully.", data: newBulkOrder },
       { status: 200 }
     );
-  } catch (error) {
-    console.error("Nodemailer error:", error);
+  } catch (error: any) {
+    console.error("Bulk Order Error:", error);
     return NextResponse.json(
-      { message: "Failed to send email. Please check server configurations." },
+      { success: false, message: error.message || "Failed to process bulk order." },
       { status: 500 }
     );
+  }
+}
+
+// Optional GET handler to populate your SuperAdmin Bulk Orders Page seamlessly
+export async function GET() {
+  try {
+    await connectDB();
+    const orders = await BulkOrder.find({}).sort({ createdAt: -1 });
+    return NextResponse.json({ success: true, data: orders }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }

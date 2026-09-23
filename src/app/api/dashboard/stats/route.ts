@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import Product from "@/models/Product";
 import Category from "@/models/Category";
 import connectDB from "@/lib/db";
+import BulkOrder from "@/models/BulkOrder";
 
 export async function GET() {
   try {
@@ -13,8 +14,7 @@ export async function GET() {
     const totalProducts = await Product.countDocuments();
     
     // Placeholder if you have a bulk order model (fallback to 0 if not yet created)
-    // const totalBulkOrders = await BulkOrder.countDocuments();
-    const totalBulkOrders = 0; 
+    const totalBulkOrders = await BulkOrder.countDocuments();
 
     // 2. Get product count breakdown per category using aggregation
     const productsPerCategory = await Product.aggregate([
