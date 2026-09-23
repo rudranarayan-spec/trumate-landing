@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
 import { Plus, Search, Trash2, Edit, Package, Layers } from "lucide-react";
+import ProductModal from "./ProductModal";
 
 export default function ProductsManagementPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -11,37 +13,70 @@ export default function ProductsManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Fetch products and categories from your API
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [prodRes, catRes] = await Promise.all([
-          fetch("/api/products"),
-          fetch("/api/categories")
-        ]);
-        
-        const prodJson = await prodRes.json();
-        const catJson = await catRes.json();
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<any | null>(null);
 
-        setProducts(prodJson.data || prodJson || []);
-        setCategories(catJson.data || catJson || []);
-      } catch (err) {
-        console.error("Failed to load inventory data", err);
-      } finally {
-        setLoading(false);
-      }
+  // Fetch products and categories
+  const fetchData = async () => {
+    try {
+      const [prodRes, catRes] = await Promise.all([
+        fetch("/api/products"),
+        fetch("/api/categories")
+      ]);
+      const prodJson = await prodRes.json();
+      const catJson = await catRes.json();
+
+      setProducts(prodJson.data || prodJson || []);
+      setCategories(catJson.data || catJson || []);
+    } catch (err) {
+      console.error("Failed to load inventory data", err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
-  // Filter products based on search query and selected category
+  // Handle Save (Create or Update)
+  const handleSaveProduct = async (productData: any) => {
+    const url = productToEdit ? `/api/products/${productToEdit._id}` : "/api/products";
+    const method = productToEdit ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(productData),
+    });
+
+    if (!res.ok) {
+      const errorJson = await res.json();
+      throw new Error(errorJson.message || "Failed to save product");
+    }
+
+    await fetchData();
+  };
+
+  // Handle Delete
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete product");
+      setProducts((prev) => prev.filter((p) => p._id !== id));
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Could not delete product.");
+    }
+  };
+
   const filteredProducts = products.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Handle category matching whether category is an object or populated ID
     const catId = p.category?._id || p.category;
     const matchesCategory = selectedCategory === "all" || catId === selectedCategory;
-
     return matchesSearch && matchesCategory;
   });
 
@@ -53,7 +88,13 @@ export default function ProductsManagementPage() {
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Products Management</h1>
           <p className="text-sm text-gray-500">Manage inventory, update pricing, and view stock status by category.</p>
         </div>
-        <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition shadow-sm">
+        <button
+          onClick={() => {
+            setProductToEdit(null);
+            setIsModalOpen(true);
+          }}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition shadow-sm"
+        >
           <Plus className="w-4 h-4" /> Add New Product
         </button>
       </div>
@@ -131,12 +172,11 @@ export default function ProductsManagementPage() {
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm">
                 {filteredProducts.map((product) => {
-                  // Find category name safely from either object lookup or matching ID in fetched list
                   const matchedCat = categories.find((c) => c._id === (product.category?._id || product.category));
                   const categoryName = product.category?.name || matchedCat?.name || "Uncategorized";
 
                   return (
-                    <tr key={product._id || product.slug} className="hover:bg-gray-50/50 transition">
+                    <tr key={product._id} className="hover:bg-gray-50/50 transition">
                       <td className="py-4 px-6 font-medium text-gray-900">{product.name}</td>
                       <td className="py-4 px-6 text-gray-600">
                         <span className="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full font-medium">
@@ -146,15 +186,28 @@ export default function ProductsManagementPage() {
                       <td className="py-4 px-6 text-gray-900 font-semibold">₹{product.price}</td>
                       <td className="py-4 px-6 text-gray-600">{product.stock} units</td>
                       <td className="py-4 px-6">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          product.status === "Published" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
+                        }`}>
                           {product.status || "Published"}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-right space-x-1">
-                        <button className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                        <button
+                          onClick={() => {
+                            setProductToEdit(product);
+                            setIsModalOpen(true);
+                          }}
+                          className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                          title="Edit"
+                        >
                           <Edit className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <button
+                          onClick={() => handleDeleteProduct(product._id)}
+                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                          title="Delete"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </td>
@@ -166,6 +219,15 @@ export default function ProductsManagementPage() {
           </div>
         )}
       </div>
+
+      {/* Modal for Add / Edit */}
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveProduct}
+        productToEdit={productToEdit}
+        categories={categories}
+      />
     </div>
   );
 }
