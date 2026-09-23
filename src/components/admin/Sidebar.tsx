@@ -3,17 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Package, Layers, ShoppingCart, ExternalLink, LogOut, MessageSquare } from "lucide-react";
+import { useAdminAuth } from "@/context/AdminAuthContext"; // Update path if your context file is located elsewhere
 
 const navItems = [
   { name: "Dashboard", href: "/superadmin/dashboard", icon: LayoutDashboard },
   { name: "Products", href: "/superadmin/dashboard/products", icon: Package },
   { name: "Categories", href: "/superadmin/dashboard/categories", icon: Layers },
   { name: "Bulk Orders", href: "/superadmin/dashboard/bulk-orders", icon: ShoppingCart },
-  { name: "Inqueries", href: "/superadmin/dashboard/contact-inqueries", icon: MessageSquare },
+  { name: "Inquiries", href: "/superadmin/dashboard/contact-inqueries", icon: MessageSquare },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { logout } = useAdminAuth(); // Consume the logout function from context
 
   return (
     <aside className="w-64 bg-gray-900 text-white flex flex-col justify-between sticky top-0 h-screen shrink-0 hidden md:flex border-r border-gray-800">
@@ -58,13 +60,13 @@ export default function Sidebar() {
           <ExternalLink className="w-5 h-5 shrink-0" />
           Visit Site
         </Link>
-        <Link
-          href="/superadmin/login"
-          className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-gray-800 hover:text-red-300 transition-colors"
+        <button
+          onClick={logout}
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-gray-800 hover:text-red-300 transition-colors cursor-pointer text-left"
         >
           <LogOut className="w-5 h-5 shrink-0" />
           Logout
-        </Link>
+        </button>
       </div>
     </aside>
   );
