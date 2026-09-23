@@ -1,24 +1,56 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Leaf, Sparkles, ArrowRight, Search, PackageOpen } from "lucide-react";
-import { PRODUCTS_DATA } from "@/data/products";
 
 export default function ProductsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<"all" | "biodegradable" | "spices">("all");
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Fetch products and categories on mount
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [prodRes, catRes] = await Promise.all([
+          fetch("/api/products"),
+          fetch("/api/categories")
+        ]);
+
+        const prodJson = await prodRes.json();
+        const catJson = await catRes.json();
+
+        if (prodJson.success) setProducts(prodJson.data);
+        if (catJson.success) setCategories(catJson.data);
+      } catch (err) {
+        console.error("Failed to fetch catalog data", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   const filteredProducts = useMemo(() => {
-    return PRODUCTS_DATA.filter((product) => {
+    return products.filter((product) => {
+      // product.category can be an object populated with slug or just an ID/string depending on your API
+      const catSlug = typeof product.category === "object" ? product.category?.slug : product.category;
+      
       const matchesCategory =
-        selectedCategory === "all" || product.category === selectedCategory;
+        selectedCategory === "all" || catSlug === selectedCategory;
+      
       const matchesSearch =
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [products, selectedCategory, searchQuery]);
 
   return (
     <div className="w-full bg-[#FAF9F5] min-h-screen py-12 px-6 md:px-12 lg:px-20">
@@ -41,7 +73,7 @@ export default function ProductsPage() {
         {/* Filter Tabs & Search Bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 border-b border-stone-200 pb-6">
           
-          {/* Category Tabs */}
+          {/* Dynamic Category Tabs */}
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setSelectedCategory("all")}
@@ -51,30 +83,26 @@ export default function ProductsPage() {
                   : "bg-white text-stone-700 border border-stone-200 hover:bg-stone-100"
               }`}
             >
-              All Products ({PRODUCTS_DATA.length})
+              All Products ({products.length})
             </button>
-            <button
-              onClick={() => setSelectedCategory("biodegradable")}
-              className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedCategory === "biodegradable"
-                  ? "bg-[#1C3516] text-amber-50 shadow-md"
-                  : "bg-white text-stone-700 border border-stone-200 hover:bg-stone-100"
-              }`}
-            >
-              <Leaf className="size-3.5" />
-              Biodegradable & Hospitality
-            </button>
-            <button
-              onClick={() => setSelectedCategory("spices")}
-              className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedCategory === "spices"
-                  ? "bg-[#1C3516] text-amber-50 shadow-md"
-                  : "bg-white text-stone-700 border border-stone-200 hover:bg-stone-100"
-              }`}
-            >
-              <Sparkles className="size-3.5" />
-              Spices (Coming Soon)
-            </button>
+
+            {categories.map((cat) => {
+              const isSpices = cat.slug.includes("spice");
+              return (
+                <button
+                  key={cat._id}
+                  onClick={() => setSelectedCategory(cat.slug)}
+                  className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer flex items-center gap-1.5 ${
+                    selectedCategory === cat.slug
+                      ? "bg-[#1C3516] text-amber-50 shadow-md"
+                      : "bg-white text-stone-700 border border-stone-200 hover:bg-stone-100"
+                  }`}
+                >
+                  {isSpices ? <Sparkles className="size-3.5" /> : <Leaf className="size-3.5" />}
+                  {cat.name} {isSpices ? "(Coming Soon)" : ""}
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Box */}
@@ -91,62 +119,73 @@ export default function ProductsPage() {
 
         </div>
 
-        {/* Product Grid */}
-        {filteredProducts.length === 0 ? (
+        {/* Loading / Product Grid */}
+        {loading ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-stone-200">
+            <p className="text-stone-500 text-sm font-sans animate-pulse">Loading live catalog from database...</p>
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-stone-200">
             <p className="text-stone-500 text-sm font-sans">No products found matching your search.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span
-                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase ${
-                        product.status === "active"
-                          ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                          : "bg-amber-50 text-amber-800 border border-amber-200"
-                      }`}
-                    >
-                      {product.status === "active" ? (
-                        <>
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600"></span> Active
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="size-3" /> Coming Soon
-                        </>
-                      )}
-                    </span>
-                    <span className="text-[10px] tracking-wider uppercase text-stone-400 font-medium">
-                      {product.category === "biodegradable" ? "Eco Packaging" : "Kitchen Spice"}
-                    </span>
+            {filteredProducts.map((product) => {
+              const isPublished = product.status?.toLowerCase() === "published";
+              const catName = typeof product.category === "object" ? product.category?.name : "Eco Packaging";
+              
+              return (
+                <div
+                  key={product._id}
+                  className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase ${
+                          isPublished
+                            ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                            : "bg-amber-50 text-amber-800 border border-amber-200"
+                        }`}
+                      >
+                        {isPublished ? (
+                          <>
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600"></span> Active
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="size-3" /> Coming Soon
+                          </>
+                        )}
+                      </span>
+                      <span className="text-[10px] tracking-wider uppercase text-stone-400 font-medium">
+                        {catName}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-serif font-medium text-[#1C3516] mb-2 group-hover:text-emerald-900 transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-stone-600 leading-relaxed font-sans mb-6">
+                      {product.description}
+                    </p>
                   </div>
 
-                  <h3 className="text-lg font-serif font-medium text-[#1C3516] mb-2 group-hover:text-emerald-900 transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-stone-600 leading-relaxed font-sans mb-6">
-                    {product.description}
-                  </p>
+                  <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+                    <Link
+                      href="/bulk-orders"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1C3516] hover:underline"
+                    >
+                      Request Bulk Quote
+                      <ArrowRight className="size-3.5" />
+                    </Link>
+                    <span className="text-[11px] text-stone-400 italic">
+                      {product.price ? `₹${product.price} / unit` : "B2B / Wholesale"}
+                    </span>
+                  </div>
                 </div>
-
-                <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
-                  <Link
-                    href="/bulk-orders"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1C3516] hover:underline"
-                  >
-                    Request Bulk Quote
-                    <ArrowRight className="size-3.5" />
-                  </Link>
-                  <span className="text-[11px] text-stone-400 italic">B2B / Wholesale</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
