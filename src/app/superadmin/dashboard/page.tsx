@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Layers, Package, ShoppingCart, TrendingUp } from "lucide-react";
+import { Layers, Package, ShoppingCart, TrendingUp, Mail } from "lucide-react";
 
 export default function DashboardOverview() {
   const [stats, setStats] = useState<any>(null);
@@ -33,8 +33,8 @@ export default function DashboardOverview() {
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold tracking-tight text-gray-900">Dashboard Overview</h1>
 
-      {/* Top Stat Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Top Stat Cards Grid (Expanded to 4 columns) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Categories */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
           <div>
@@ -65,6 +65,17 @@ export default function DashboardOverview() {
           </div>
           <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
             <ShoppingCart className="w-6 h-6" />
+          </div>
+        </div>
+
+        {/* Total Contact Inquiries */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-500">Contact Inquiries</p>
+            <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats?.contact_inquries || 0}</h3>
+          </div>
+          <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
+            <Mail className="w-6 h-6" />
           </div>
         </div>
       </div>
@@ -102,7 +113,7 @@ export default function DashboardOverview() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">System Status</h2>
             <p className="text-sm text-gray-500 mb-4">
-              Your database is active, synced with MongoDB Atlas, and currently serving categories like <strong>Eco Friendly</strong> and <strong>Spices</strong>.
+              Your database is active, synced with MongoDB Atlas, and currently serving active inquiries and product inventories.
             </p>
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-2">
               <div className="flex justify-between text-sm">
@@ -111,7 +122,7 @@ export default function DashboardOverview() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Active Seeder Status</span>
-                <span className="text-blue-600 font-medium">Synced (2 Categories)</span>
+                <span className="text-blue-600 font-medium">Synced</span>
               </div>
             </div>
           </div>

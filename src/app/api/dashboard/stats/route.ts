@@ -4,6 +4,7 @@ import Product from "@/models/Product";
 import Category from "@/models/Category";
 import connectDB from "@/lib/db";
 import BulkOrder from "@/models/BulkOrder";
+import Contact from "@/models/Contact";
 
 export async function GET() {
   try {
@@ -15,6 +16,7 @@ export async function GET() {
     
     // Placeholder if you have a bulk order model (fallback to 0 if not yet created)
     const totalBulkOrders = await BulkOrder.countDocuments();
+    const contact_inquries = await Contact.countDocuments();
 
     // 2. Get product count breakdown per category using aggregation
     const productsPerCategory = await Product.aggregate([
@@ -52,6 +54,7 @@ export async function GET() {
         totalProducts,
         totalBulkOrders,
         productsPerCategory,
+        contact_inquries
       },
     });
   } catch (error: any) {

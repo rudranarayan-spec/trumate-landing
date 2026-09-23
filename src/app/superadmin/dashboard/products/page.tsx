@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Trash2, Edit, Package, Layers } from "lucide-react";
 import ProductModal from "./ProductModal";
+import { toast } from "sonner";
 
 export default function ProductsManagementPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -60,17 +61,30 @@ export default function ProductsManagementPage() {
   };
 
   // Handle Delete
-  const handleDeleteProduct = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+  const handleDeleteProduct = (id: string) => {
+    toast("Are you sure you want to delete this product?", {
+      duration: Infinity,
+      action: {
+        label: "Confirm",
+        onClick: async () => {
+          try {
+            const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
 
-    try {
-      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete product");
-      setProducts((prev) => prev.filter((p) => p._id !== id));
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Could not delete product.");
-    }
+            if (!res.ok) throw new Error("Failed to delete product");
+
+            toast.success("Product deleted successfully");
+            setProducts((prev) => prev.filter((p) => p._id !== id));
+          } catch (err) {
+            console.error("Delete error:", err);
+            toast.error("Could not delete product.");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => { },
+      },
+    });
   };
 
   const filteredProducts = products.filter((p) => {
@@ -103,11 +117,10 @@ export default function ProductsManagementPage() {
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
         <button
           onClick={() => setSelectedCategory("all")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-            selectedCategory === "all"
+          className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === "all"
               ? "bg-gray-900 text-white shadow-sm"
               : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-          }`}
+            }`}
         >
           All Products ({products.length})
         </button>
@@ -117,11 +130,10 @@ export default function ProductsManagementPage() {
             <button
               key={cat._id}
               onClick={() => setSelectedCategory(cat._id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                selectedCategory === cat._id
+              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${selectedCategory === cat._id
                   ? "bg-blue-600 text-white shadow-sm"
                   : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-              }`}
+                }`}
             >
               <Layers className="w-3.5 h-3.5" />
               {cat.name} ({count})
@@ -186,9 +198,8 @@ export default function ProductsManagementPage() {
                       <td className="py-4 px-6 text-gray-900 font-semibold">₹{product.price}</td>
                       <td className="py-4 px-6 text-gray-600">{product.stock} units</td>
                       <td className="py-4 px-6">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          product.status === "Published" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
-                        }`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === "Published" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
+                          }`}>
                           {product.status || "Published"}
                         </span>
                       </td>
