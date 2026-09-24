@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import { AdminAuthProvider } from "@/context/AdminAuthContext";
+
+export const metadata: Metadata = {
+  title: "Super Admin Dashboard | Trumate",
+  description: "Internal management dashboard for Trumate administrators.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function SuperAdminLayout({
   children,
