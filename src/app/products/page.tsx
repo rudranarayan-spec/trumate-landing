@@ -38,7 +38,6 @@ export default function ProductsPage() {
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      // product.category can be an object populated with slug or just an ID/string depending on your API
       const catSlug = typeof product.category === "object" ? product.category?.slug : product.category;
       
       const matchesCategory =
@@ -53,31 +52,31 @@ export default function ProductsPage() {
   }, [products, selectedCategory, searchQuery]);
 
   return (
-    <div className="w-full bg-[#FAF9F5] min-h-screen py-12 px-6 md:px-12 lg:px-20">
+    <div className="w-full bg-[#FAF9F5] min-h-screen py-10 sm:py-12 px-4 sm:px-6 md:px-12 lg:px-20">
       <div className="mx-auto max-w-7xl">
         
         {/* Page Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1C3516]/10 text-[#1C3516] text-xs font-semibold tracking-widest uppercase mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1C3516]/10 text-[#1C3516] text-[11px] sm:text-xs font-semibold tracking-widest uppercase mb-3 sm:mb-4">
             <PackageOpen className="size-3.5" />
             Our Catalog
           </div>
-          <h1 className="text-3xl md:text-5xl font-serif text-[#1C3516] tracking-tight mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif text-[#1C3516] tracking-tight mb-3 sm:mb-4">
             Sustainable Consumables & Kitchen Essentials
           </h1>
-          <p className="text-sm md:text-base text-stone-600 leading-relaxed font-sans">
+          <p className="text-xs sm:text-sm md:text-base text-stone-600 leading-relaxed font-sans px-2 sm:px-0">
             Explore Trumate’s professional-grade eco-friendly tableware, hospitality items, and upcoming pure kitchen spices.
           </p>
         </div>
 
         {/* Filter Tabs & Search Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 border-b border-stone-200 pb-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 mb-10 sm:mb-12 border-b border-stone-200 pb-6">
           
           {/* Dynamic Category Tabs */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 w-full md:w-auto">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer ${
                 selectedCategory === "all"
                   ? "bg-[#1C3516] text-amber-50 shadow-md"
                   : "bg-white text-stone-700 border border-stone-200 hover:bg-stone-100"
@@ -92,7 +91,7 @@ export default function ProductsPage() {
                 <button
                   key={cat._id}
                   onClick={() => setSelectedCategory(cat.slug)}
-                  className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer flex items-center gap-1.5 ${
                     selectedCategory === cat.slug
                       ? "bg-[#1C3516] text-amber-50 shadow-md"
                       : "bg-white text-stone-700 border border-stone-200 hover:bg-stone-100"
@@ -121,15 +120,15 @@ export default function ProductsPage() {
 
         {/* Loading / Product Grid */}
         {loading ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-stone-200">
-            <p className="text-stone-500 text-sm font-sans animate-pulse">Loading live catalog from database...</p>
+          <div className="text-center py-16 sm:py-20 bg-white rounded-3xl border border-stone-200 px-4">
+            <p className="text-stone-500 text-xs sm:text-sm font-sans animate-pulse">Loading live catalog from database...</p>
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-stone-200">
-            <p className="text-stone-500 text-sm font-sans">No products found matching your search.</p>
+          <div className="text-center py-16 sm:py-20 bg-white rounded-3xl border border-stone-200 px-4">
+            <p className="text-stone-500 text-xs sm:text-sm font-sans">No products found matching your search.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {filteredProducts.map((product) => {
               const isPublished = product.status?.toLowerCase() === "published";
               const catName = typeof product.category === "object" ? product.category?.name : "Eco Packaging";
@@ -137,12 +136,12 @@ export default function ProductsPage() {
               return (
                 <div
                   key={product._id}
-                  className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+                  className="bg-white rounded-2xl border border-stone-200/80 p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
                       <span
-                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase ${
+                        className={`inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase ${
                           isPublished
                             ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                             : "bg-amber-50 text-amber-800 border border-amber-200"
@@ -163,10 +162,10 @@ export default function ProductsPage() {
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-serif font-medium text-[#1C3516] mb-2 group-hover:text-emerald-900 transition-colors">
+                    <h3 className="text-base sm:text-lg font-serif font-medium text-[#1C3516] mb-2 group-hover:text-emerald-900 transition-colors">
                       {product.name}
                     </h3>
-                    <p className="text-xs text-stone-600 leading-relaxed font-sans mb-6">
+                    <p className="text-xs text-stone-600 leading-relaxed font-sans mb-5 sm:mb-6">
                       {product.description}
                     </p>
                   </div>

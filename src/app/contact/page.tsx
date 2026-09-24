@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -47,28 +48,28 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="w-full bg-[#FAF9F5] min-h-screen py-16 px-6 md:px-12 lg:px-20">
+        <div className="w-full bg-[#FAF9F5] min-h-screen py-10 sm:py-14 md:py-16 px-4 sm:px-6 md:px-12 lg:px-20">
             <div className="mx-auto max-w-6xl">
 
                 {/* Page Header */}
-                <div className="text-center max-w-2xl mx-auto mb-16">
+                <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 md:mb-16">
                     <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1C3516]/10 text-[#1C3516] text-xs font-semibold tracking-widest uppercase mb-4">
                         <MessageSquare className="size-3.5" />
                         Get in Touch
                     </div>
-                    <h1 className="text-3xl md:text-5xl font-serif text-[#1C3516] tracking-tight mb-4">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#1C3516] tracking-tight mb-4">
                         We&apos;d love to hear from you.
                     </h1>
-                    <p className="text-sm md:text-base text-stone-600 leading-relaxed font-sans">
-                        Have questions about our biodegradable tableware or pure kitchen spices? Reach out to our team and we'll get back to you shortly.
+                    <p className="text-sm md:text-base text-stone-600 leading-relaxed font-sans px-2 sm:px-0">
+                        Have questions about our biodegradable tableware or pure kitchen spices? Reach out to our team and we&apos;ll get back to you shortly.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-start">
 
                     {/* Left Contact Info Cards */}
-                    <div className="lg:col-span-4 space-y-6">
-                        <div className="bg-white rounded-2xl p-6 border border-stone-200 shadow-xs">
+                    <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 sm:gap-6">
+                        <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-xs">
                             <div className="flex items-start gap-4">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1C3516]/10 text-[#1C3516]">
                                     <MapPin className="size-5" />
@@ -83,7 +84,7 @@ export default function ContactPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-2xl p-6 border border-stone-200 shadow-xs">
+                        <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-xs">
                             <div className="flex items-start gap-4">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1C3516]/10 text-[#1C3516]">
                                     <Phone className="size-5" />
@@ -98,14 +99,14 @@ export default function ContactPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-2xl p-6 border border-stone-200 shadow-xs">
+                        <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-xs">
                             <div className="flex items-start gap-4">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1C3516]/10 text-[#1C3516]">
                                     <Mail className="size-5" />
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-serif font-semibold text-stone-900 mb-1">Email Us</h3>
-                                    <p className="text-xs text-stone-600 leading-relaxed">
+                                    <p className="text-xs text-stone-600 leading-relaxed break-all">
                                         support@trumate.com<br />
                                         bulk@trumate.com
                                     </p>
@@ -115,9 +116,9 @@ export default function ContactPage() {
                     </div>
 
                     {/* Right Contact Form */}
-                    <div className="lg:col-span-8 bg-white rounded-3xl border border-stone-200 shadow-xl p-8 md:p-12">
-                        <h2 className="text-2xl font-serif text-[#1C3516] mb-2">Send us a Message</h2>
-                        <p className="text-xs md:text-sm text-stone-500 mb-8 font-sans">
+                    <div className="lg:col-span-8 bg-white rounded-2xl sm:rounded-3xl border border-stone-200 shadow-xl p-6 sm:p-8 md:p-12">
+                        <h2 className="text-xl sm:text-2xl font-serif text-[#1C3516] mb-2">Send us a Message</h2>
+                        <p className="text-xs md:text-sm text-stone-500 mb-6 sm:mb-8 font-sans">
                             Fill out the form below and our customer care team will respond within 24 hours.
                         </p>
 
@@ -128,7 +129,7 @@ export default function ContactPage() {
                         )}
 
                         {status.success ? (
-                            <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-8 text-center flex flex-col items-center justify-center">
+                            <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-6 sm:p-8 text-center flex flex-col items-center justify-center">
                                 <div className="h-14 w-14 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 mb-4">
                                     <CheckCircle2 className="size-8" />
                                 </div>
@@ -138,14 +139,14 @@ export default function ContactPage() {
                                 </p>
                                 <button
                                     onClick={() => setStatus({ submitting: false, success: false, error: null })}
-                                    className="bg-[#1C3516] text-amber-50 px-6 py-2.5 rounded-xl text-xs font-medium hover:bg-[#274a20]"
+                                    className="bg-[#1C3516] text-amber-50 px-6 py-2.5 rounded-xl text-xs font-medium hover:bg-[#274a20] cursor-pointer"
                                 >
                                     Send Another Message
                                 </button>
                             </div>
                         ) : (
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                                     <div>
                                         <label className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-2">
                                             Your Full Name *
@@ -176,7 +177,7 @@ export default function ContactPage() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                                     <div>
                                         <label className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-2">
                                             Phone Number
@@ -219,7 +220,7 @@ export default function ContactPage() {
                                         value={formData.message}
                                         onChange={handleChange}
                                         placeholder="How can we help you today?"
-                                        className="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-800 outline-none focus:border-[#1C3516] focus:bg-white transition-all"
+                                        className="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-800 outline-none focus:border-[#1C3516] focus:bg-white transition-all resize-y"
                                     ></textarea>
                                 </div>
 

@@ -54,13 +54,13 @@ export default function Footer() {
 
   return (
     <footer className="w-full bg-[#FAF9F5] border-t border-stone-200 text-stone-800">
-      <div className="mx-auto max-w-7xl px-6 py-16 md:px-12 lg:px-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-12 lg:px-20 py-12 sm:py-16">
         
         {/* Top Grid Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 pb-14 border-b border-stone-200/80">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 pb-12 sm:pb-14 border-b border-stone-200/80">
           
           {/* Brand Info & Mission (Spans 2 columns on large screens) */}
-          <div className="lg:col-span-2 flex flex-col justify-start">
+          <div className="sm:col-span-2 flex flex-col justify-start">
             <Link href="/" className="inline-block mb-4">
               <Image
                 src="/logo.png"
@@ -68,10 +68,10 @@ export default function Footer() {
                 width={180}
                 height={90}
                 unoptimized
-                className="h-14 w-auto object-contain"
+                className="h-12 sm:h-14 w-auto object-contain"
               />
             </Link>
-            <p className="text-sm text-stone-600 max-w-sm leading-relaxed mb-6 font-sans">
+            <p className="text-xs sm:text-sm text-stone-600 max-w-sm leading-relaxed mb-6 font-sans">
               Bringing quality to every kitchen with authentic pure spices and sustainable, 100% biodegradable food-service packaging for a greener tomorrow.
             </p>
             
@@ -120,10 +120,10 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div className="flex flex-col">
-            <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1C3516] mb-4">
+            <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1C3516] mb-3 sm:mb-4">
               Shop Categories
             </h4>
-            <ul className="space-y-3 text-sm">
+            <ul className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
               <li>
                 <Link href="/products" className="text-stone-600 hover:text-[#1C3516] transition-colors">
                   Pure Spices & Masalas
@@ -149,10 +149,10 @@ export default function Footer() {
 
           {/* Company Links */}
           <div className="flex flex-col">
-            <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1C3516] mb-4">
+            <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1C3516] mb-3 sm:mb-4">
               Company
             </h4>
-            <ul className="space-y-3 text-sm">
+            <ul className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
               <li>
                 <Link href="/about" className="text-stone-600 hover:text-[#1C3516] transition-colors">
                   About Us
@@ -177,11 +177,11 @@ export default function Footer() {
           </div>
 
           {/* Contact Details */}
-          <div className="flex flex-col">
-            <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1C3516] mb-4">
+          <div className="flex flex-col sm:col-span-2 lg:col-span-1">
+            <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-[#1C3516] mb-3 sm:mb-4">
               Get in Touch
             </h4>
-            <ul className="space-y-3 text-xs md:text-sm text-stone-600">
+            <ul className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm text-stone-600">
               <li className="flex items-start gap-2.5">
                 <MapPin className="size-4 text-[#1C3516] shrink-0 mt-0.5" />
                 <span>India</span>
@@ -200,12 +200,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Copyright & Legal Bar */}
-        <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-stone-500">
+        <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left text-xs text-stone-500">
           <p>© {new Date().getFullYear()} Trumate. All rights reserved.</p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             <Link href="/terms" className="hover:text-[#1C3516] transition-colors">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-[#1C3516] transition-colors">Privacy Policy</Link>
-            <Link href="/shipping" className="hover:text-[#1C3516] transition-colors">Shipping & Returns</Link>
           </div>
         </div>
 
