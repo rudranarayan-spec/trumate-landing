@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Layers, ShoppingCart, ExternalLink, LogOut, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Package, Layers, ShoppingCart, ExternalLink, LogOut, MessageSquare, NewspaperIcon, Mail } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext"; // Update path if your context file is located elsewhere
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
   { name: "Categories", href: "/superadmin/dashboard/categories", icon: Layers },
   { name: "Bulk Orders", href: "/superadmin/dashboard/bulk-orders", icon: ShoppingCart },
   { name: "Inquiries", href: "/superadmin/dashboard/contact-inqueries", icon: MessageSquare },
+  { name: "Newsletter", href: "/superadmin/dashboard/newsletter", icon: Mail },
 ];
 
 export default function Sidebar() {
